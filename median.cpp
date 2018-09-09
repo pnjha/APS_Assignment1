@@ -1,138 +1,225 @@
 #include<bits/stdc++.h>
 #define MAXHEAP  1
 #define MINHEAP  0
+#define ll long long int 
+#define SIZE 100007
 using namespace std;
 
+ll minHeap[SIZE] ,maxHeap[SIZE];
+ll minIndex = -1;
+ll maxIndex = -1;
 
 
-void minHeapify(vector<int> &heap,int index){
-	int smallest = index;
-	int left = 2*index + 1;
-	int right = 2*index + 2;
+void minHeapify(ll index){
+    //cout<<"minHeapify\n";
+    ll smallest = index;
+    ll left = 2*index + 1;
+    ll right = 2*index + 2;
 
-	if(left<heap.size()&&heap[left]<heap[index]){
-		smallest = left;
+    if(left<=minIndex&&minHeap[left]<minHeap[index]){
+        smallest = left;
 
-	}else if(right<heap.size()&&heap[right]<heap[smallest]){
-		smallest = right;
-	}
+    }
+    if(right<=minIndex&&minHeap[right]<minHeap[smallest]){
+        smallest = right;
+    }
 
-	if(smallest!=index){
-		int temp = heap[smallest];
-		heap[smallest] = heap[index];
-		heap[index] = temp;
-		minHeapify(heap,smallest);
-	}
+    if(smallest!=index){
+        ll temp = minHeap[smallest];
+        minHeap[smallest] = minHeap[index];
+        minHeap[index] = temp;
+        minHeapify(smallest);
+    }
 }
 
-void maxHeapify(vector<int> &heap,int index){
+void maxHeapify(ll index){
+    //cout<<"maxHeapify\n";
+    ll largest = index;
+    ll left =  2*index + 1;
+    ll right = 2*index + 2;
 
-	int largest = index;
-	int left =  2*index + 1;
-	int right = 2*index + 2;
+    if(left<=maxIndex&&maxHeap[left]>maxHeap[index]){
+        largest = left;
+    }
+    if(right<=maxIndex&&maxHeap[right]>maxHeap[largest]){
+        largest = right;
+    }
 
-	if(left<heap.size()&&heap[left]>heap[index]){
-		largest = left;
-	}
-	else if(right<heap.size()&&heap[right]>heap[largest]){
-		largest = right;
-	}
-
-	if(largest!=index){
-		int temp = heap[largest];
-		heap[largest] = heap[index];
-		heap[index] = temp;
-		maxHeapify(heap,largest);
-	}
+    if(largest!=index){
+        ll temp = maxHeap[largest];
+        maxHeap[largest] = maxHeap[index];
+        maxHeap[index] = temp;
+        maxHeapify(largest);
+    }
 
 }
 
-void pushElement(vector<int> &minHeap,vector<int> &maxHeap,int element){
-	if(maxHeap.size()==0||element<maxHeap[0]){
-		maxHeap.push_back(element);
-		maxHeapify(maxHeap,0);
-	}else{
-		minHeap.push_back(element);
-		minHeapify(minHeap,0);
-	}
+
+void insertMinHeap(){
+    //cout<<"insertMinHeap\n";
+    ll temp,t,i;
+    if(minIndex==1){
+        if(minHeap[0]>minHeap[1]){
+            temp = minHeap[0];
+            minHeap[0] = minHeap[1];
+            minHeap[1] = temp;
+        }
+    }
+    else if(minIndex>=2){
+        temp = minIndex;
+        double numerator = (double)temp,denominator = 2.0;
+        i = (temp-1)/2;
+      //  cout<<"parent: "<<i<<" child: "<<temp<<"\n";
+        while(i>=0){
+            //cout<<" minHeap "<<minHeap[i]<<" temp "<<temp<<"\n";
+            if(minHeap[i]>minHeap[temp]){
+                t = minHeap[temp];
+                minHeap[temp] = minHeap[i];
+                minHeap[i] = t;
+                //minHeap[temp] = minHeap[i/2];
+                temp = i;
+                numerator = (double)i;
+                i = (i-1)/2;
+               // cout<<"parent: "<<i<<" child: "<<temp<<"\n";
+            }else{
+                break;
+            }
+            //cout<<"i "<<i<<"\n";
+        }
+    }
 }
 
-int popElement(vector<int> &heap,int type){
-	int top = heap[0];
-	heap[0] = heap[heap.size()-1];
-	heap.erase (heap.begin()+heap.size()-1);
-	if(type == MAXHEAP){
-		maxHeapify(heap,0);
-	}else{
-		minHeapify(heap,0);
-	}
-	return top;
+
+void insertMaxHeap(){
+    ll temp,t,i;
+    if(maxIndex==1){
+        if(maxHeap[0]<maxHeap[1]){
+            temp = maxHeap[0];
+            maxHeap[0] = maxHeap[1];
+            maxHeap[1] = temp;
+        }
+    }
+    else if(maxIndex>=2){
+        temp = maxIndex;
+        double numerator = (double)temp,denominator = 2.0;
+        i = (temp-1)/2;
+       // cout<<"parent: "<<i<<" child: "<<temp<<"\n";
+        while(i>=0){
+            //cout<<" minHeap "<<minHeap[i]<<" temp "<<temp<<"\n";
+            if(maxHeap[i]<maxHeap[temp]){
+                t = maxHeap[temp];
+                maxHeap[temp] = maxHeap[i];
+                maxHeap[i] = t;
+                //minHeap[temp] = minHeap[i/2];
+                temp = i;
+                numerator = (double)i;
+                i = (i-1)/2;
+               // cout<<"parent: "<<i<<" child: "<<temp<<"\n";
+            }else{
+                break;
+            }
+            //cout<<"i "<<i<<"\n";
+        }
+    }
 }
 
-void printHeaps(vector<int> &minHeap,vector<int> &maxHeap){
-	
-	for(int i=0;i<minHeap.size();i++){
-		cout<<minHeap[i]<<" ";
-	}
-
-	for(int i=0;i<maxHeap.size();i++){
-		cout<<maxHeap[i]<<" ";
-	}
-	cout<<"\n";
+void pushElement(ll element){
+    //cout<<"pushElement\n";
+    if(maxIndex==-1||element<maxHeap[0]){
+        maxIndex++;    
+        maxHeap[maxIndex] = element;
+        insertMaxHeap();
+    }else{
+        minIndex++;
+        minHeap[minIndex] = element;
+        insertMinHeap();
+    }
 }
 
-void balanceHeaps(vector<int> &minHeap,vector<int> &maxHeap){
-	
-	int maxHeapSize = maxHeap.size();
-	int minHeapSize = minHeap.size();
-	
-	int difference = abs(maxHeapSize-minHeapSize);
-
-	if(difference>1){
-		if(minHeap.size()>maxHeap.size()){
-			maxHeap.push_back(popElement(minHeap,MINHEAP));
-			maxHeapify(maxHeap,0);
-		}else if(maxHeap.size()>minHeap.size()){
-			minHeap.push_back(popElement(maxHeap,MAXHEAP));
-			minHeapify(minHeap,0);
-		}
-	}
+ll popElement(ll type){
+    ll top;
+    if(type == MAXHEAP){
+        top = maxHeap[0];
+        maxHeap[0] = maxHeap[maxIndex];
+        maxIndex--;
+        maxHeapify(0);
+    }else{
+        top = minHeap[0];
+        minHeap[0] = minHeap[minIndex];
+        minIndex--;
+        minHeapify(0);
+    }
+    return top;
 }
 
-double getMedian(vector<int> &minHeap,vector<int> &maxHeap){
-	if(minHeap.size()==maxHeap.size()){
-		return (double)(minHeap[0]+maxHeap[0])/2;
-	}else if(minHeap.size()>maxHeap.size()){
-		return (double)minHeap[0];
-	}else{
-		return (double)maxHeap[0];
-	}
-	return -1;
+void printHeaps(){
+    
+    cout<<"minHeap: ";
+    for(ll i=0;i<=minIndex;i++){
+        cout<<minHeap[i]<<" ";
+    }
+    cout<<"\nMaxheap: ";
+    for(ll i=0;i<=maxIndex;i++){
+        cout<<maxHeap[i]<<" ";
+    }
+    cout<<"\n";
 }
+
+void balanceHeaps(){
+
+    ll difference = abs((maxIndex+1) - (minIndex+1));
+
+    if(difference>1){
+        if((maxIndex+1)<(minIndex+1)){
+            maxIndex++;
+            maxHeap[maxIndex] = popElement(MINHEAP);
+            insertMaxHeap();
+        }else if((maxIndex+1)>(minIndex+1)){
+            minIndex++;
+            minHeap[minIndex] = popElement(MAXHEAP);
+            insertMinHeap();
+        }
+    }
+}
+
+long double getMedian(){
+    //cout<<"getMedian\n";
+    if(minIndex==maxIndex){
+        return (long double)(minHeap[0]+maxHeap[0])/2;
+    }else if(minIndex>maxIndex){
+        return (long double)minHeap[0];
+    }else{
+        return (long double)maxHeap[0];
+    }
+    return -1;
+}
+
+
+
+void buildMaxHeap(){
+    for(int i=maxIndex;i>=0;i--)
+        maxHeapify(i);
+}
+
+void buildMinHeap(){
+    for(int i=minIndex;i>=0;i--)
+        minHeapify(i);
+}
+
 
 int main(){
 
-	vector<int> minHeap ,maxHeap;
-
-	int n;
-	cout<<"Enter element: ";
-	while(cin>>n){
-
-		cout<<"\n";
-		pushElement(minHeap,maxHeap,n);
-		//balanceHeaps(minHeap,maxHeap);
-		cout<<"Elements in minHeap: ";
-		for(int i=0;i<minHeap.size();i++)
-			cout<<minHeap[i]<<" ";
-		cout<<"\n";
-		cout<<"Elements in maxHeap: ";
-		for(int i=0;i<maxHeap.size();i++)
-			cout<<maxHeap[i]<<" ";
-		cout<<"\n";
-		//printHeaps(minHeap,maxHeap);
-		balanceHeaps(minHeap,maxHeap);
-		cout<<"Median: "<<getMedian(minHeap,maxHeap)<<"\n";
-		cout<<"Enter next element: ";
-	}
-	return 0;	
-}	
+    ll t, n;
+    cin>>t;
+    while(t--){
+        cin>>n;
+        pushElement(n);
+       // printHeaps();
+        balanceHeaps();
+       // buildMinHeap();
+       // buildMaxHeap();
+        //printHeaps();
+        printf("%0.1Lf\n",getMedian());
+    }
+    return 0;    
+}
